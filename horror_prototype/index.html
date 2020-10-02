@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Living horrors online</title>
+  <link rel="stylesheet" href="loo.css">
+</head>
+
+<body>
+  <section id="menu">
+    <button id="run">Run</button><br>
+    Battery usage:<input type="text" value="0.01">
+  </section>
+  <section id="loadscreen">
+    Hey man! I'm f**king loading this f**king game... Give me a f**cking second!!
+  </section>
+  <section id="wasted">
+    You R dead
+    <div id="time"></div>
+  </section>
+  <section id="game">
+    <canvas></canvas>
+    <button id="go"></button>
+    <button id="back"></button>
+    <button id="left"></button>
+    <button id="right"></button>
+    <button id="lighter"></button>
+    <div id="hp"></div>
+    <div id="timer">00:00</div>
+    <div id="battery"></div>
+  </section>
+  <style>
+    * {
+      overflow: hidden;
+    }
+
+    #game,
+    #menu,
+    #wasted {
+      display: none;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #go {
+      position: fixed;
+      bottom: 70px;
+      left: 70px;
+      height: 50px;
+      width: 50px;
+    }
+
+    #back {
+      position: fixed;
+      bottom: 10px;
+      left: 70px;
+      height: 50px;
+      width: 50px;
+    }
+
+    #left {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      height: 50px;
+      width: 50px;
+    }
+
+    #right {
+      position: fixed;
+      bottom: 10px;
+      left: 130px;
+      height: 50px;
+      width: 50px;
+    }
+
+    #lighter {
+      /*display: none;*/
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      height: 50px;
+      width: 50px;
+    }
+
+    #hp,
+    #battery {
+      opacity: 0.6;
+    }
+
+    #hp {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: white;
+      width: 200px;
+      height: 15px;
+      z-index: 100;
+    }
+
+    #battery {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: white;
+      width: 200px;
+      height: 15px;
+      z-index: 100;
+    }
+
+    #timer {
+      position: fixed;
+      top: 7px;
+      left: 0px;
+      width: 100%;
+      color: white;
+      font-weight: bolder;
+      font-size: 20px;
+      text-align: center;
+      height: auto;
+      z-index: 100;
+    }
+  </style>
+  <script src="babylon.js"></script>
+  <script src="cell.js"></script>
+  <script src="cannon.js"></script>
+  <!--<script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>-->
+  <script>
+    with(BABYLON) {
+      //runGame(0.01)
+      let splashTime = 2000
+      setTimeout(function() {
+
+        document.querySelector('#menu').style.display = "block"
+        document.querySelector('#loadscreen').style.display = "none"
+
+
+
+        document.querySelector('#run').onclick = e => {
+          runGame(document.querySelector('input').value)
+        }
+
+        function runGame(battery_usage) {
+          document.querySelector("#game").style.display = "block"
+          document.querySelector('#menu').style.display = "none"
+
+          let canvas = document.querySelector("canvas")
+          let engine = new Engine(canvas, true);
+          let scene = new Scene(engine)
+          scene.clearColor = new Color3(0, 0, 0) //(0, 0, 0)
+
+          let gravityVector = new Vector3(0, -9.81, 0)
+          let physicsPlugin = new CannonJSPlugin()
+          scene.enablePhysics(gravityVector, physicsPlugin)
+
+          let cam = new FreeCamera("cam", new Vector3(0, 1.5, 0), scene)
+          cam.attachControl(canvas, true)
+
+          let player = MeshBuilder.CreateBox('player', { height: 3, width: 2, depth: 2 }, scene)
+          player.physicsImpostor = new PhysicsImpostor(player, PhysicsImpostor.BoxImpostor, { mass: 1, restitution: 1 }, scene);
+
+          let flash = new SpotLight("spotLight", new Vector3(0, 0, 0), new Vector3(0, 0, 10), Math.PI / 3, 2, scene);
+          flash.range = 25
+
+          let moon = new HemisphericLight("light1", new Vector3(0, 5, 3), scene)
+          moon.intensity = 0.01
+
+          /*let red = new PointLight('red', new Vector3(2, 2, 2), scene)
+          red.diffuse = new Color3(1, 0, 0)
+          red.range = 3
+          red.intensity = 2*/
+
+          //let shgen = new ShadowGenerator(1024, flash)
+          //shgen.useExponentialShadowMap = false
+
+          let entities = []
+
+          //funcs
+          function rand(max, min) {
+            let result = Math.random() * (+max - +min) + +min
+            return {
+              real: result,
+              natural: Math.floor(result)
+            }
+          }
+
+          function zombie(x, y, z) {
+            let enemy = new Mesh('zombie', scene)
+            let plane = MeshBuilder.CreatePlane('zombie', { width: 3, height: 6 }, scene)
+            plane.rotation.y = -Math.PI
+            let m = new StandardMaterial('playermaterial', scene)
+            m.diffuseTexture = new Texture('test.jpg', scene)
+            m.diffuseTexture.hasAlpha = true
+            m.specularColor = new Color3(0, 0, 0)
+            plane.material = m
+            enemy.addChild(plane)
+            enemy.position = new Vector3(x, y, z)
+            enemy.plane = plane
+            entities.push(enemy)
+            return enemy
+          }
+
+          let enemspeed = 2
+          let enemwalk = 0.1
+          let enemnumber = 0.4
+          let enemsight = 15
+          let enemteltime = 5000
+          let enemtelposx = [-100, 100]
+          let enemtelposz = [-100, 100]
+          let enem = zombie(0, -100000000000000000000000000000000, 0, 100)
+
+          /*function block(name,x,y,z){
+            let e = MeshBuilder.CreateBox(name, {
+              width: 1,
+              height: 1,
+              depth: 1
+            }, scene)
+            e.position = new Vector3(x,y-1,z)
+            return e
+          }*/
+
+
+          //now customs
+
+          let ground = MeshBuilder.CreateBox("box", {
+            width: 1000,
+            height: 1,
+            depth: 1000
+          }, scene)
+          ground.position.y = -1
+          ground.receiveShadows = true
+
+          let bx = MeshBuilder.CreateBox('bx', { height: 10, width: 10 }, scene)
+          bx.position.z = 5
+          bx.position.y = 5
+          bx.receiveShadows = true
+
+          bx.physicsImpostor = new PhysicsImpostor(bx, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 1 }, scene)
+
+          let w = MeshBuilder.CreateBox('#', { height: 10, width: 10 }, scene)
+          w.position.y = 5
+          w.position.z = 5
+          w.position.x = 12.5
+
+          w.physicsImpostor = new PhysicsImpostor(w, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 1 }, scene)
+
+
+          let e = MeshBuilder.CreateBox('#', { height: 5, width: 5 }, scene)
+          e.position.y = 7.5
+          e.position.z = 5
+          e.position.x = 7
+
+          e.physicsImpostor = new PhysicsImpostor(e, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 1 }, scene)
+
+
+          ground.physicsImpostor = new PhysicsImpostor(ground, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0 }, scene)
+          //shgen.getShadowMap().renderList.push(bx)
+          //shgen.addShadowCaster(bx)
+
+
+
+
+
+          //let xx = MeshBuilder.CreateBox('bx', {}, scene)
+          //xx.position.x = 4
+          //xx.receiveShadows = true
+          //shgen.getShadowMap().renderList.push(xx)
+          //shgen.addShadowCaster(xx)
+
+
+
+
+
+
+
+
+          let lrkey = 0
+          let fbkey = 0
+          let posx = 0
+          let posz = 0
+          let posy = 1.5
+          let step = 4
+          let degsq = Math.PI / 2
+
+          let hunger = 100
+          let hunger_max = 100
+
+          let battery = 100
+          let battery_max = 100
+          let batteryUsage = battery_usage
+
+          let flashonoff = true
+
+          let begin = Date.now()
+          let min = 0
+          let sec = 0
+          isplaying = true
+
+          //player.position.y=10
+
+          function loop() {
+            //console.log(bx.position.y)
+            scene.render()
+            if (isplaying) {
+              sec = Math.floor((Date.now() - begin) / 1000)
+              min = Math.floor(sec / 60)
+            }
+
+            document.querySelector("#timer").innerHTML = min + ":" + (sec - min * 60)
+            document.querySelector("#time").innerHTML = min + ":" + (sec - min * 60)
+
+            player.position.y = posy
+            //player.position = new Vector3(posx,posy,posz)
+            cam.position = player.position
+            cam.position.y = player.position.y + 1.5
+
+            flash.position = cam.position
+            flash.direction = new Vector3(
+              Math.sin(cam.rotation.y) * 2,
+              -Math.sin(cam.rotation.x) * 2,
+              Math.cos(cam.rotation.y) * 2
+            )
+
+            if (battery > 0) {
+              flash.setEnabled(flashonoff)
+            }
+            else {
+              flash.setEnabled(false)
+            }
+
+
+            if (flashonoff) {
+              battery -= batteryUsage
+            }
+
+            if (fbkey == 1) {
+              player.physicsImpostor.setLinearVelocity(new Vector3(step * Math.sin(cam.rotation.y), 0, step * Math.cos(cam.rotation.y)))
+              /*player.position.x += step * Math.sin(cam.rotation.y)
+              player.position.z += step * Math.cos(cam.rotation.y)*/
+            }
+            else if (fbkey == -1) {
+              player.physicsImpostor.setLinearVelocity(new Vector3(-step * Math.sin(cam.rotation.y), 0, -step * Math.cos(cam.rotation.y)))
+              /*player.position.x -= step * Math.sin(cam.rotation.y)
+              player.position.z -= step * Math.cos(cam.rotation.y)*/
+            }
+            else {
+              player.physicsImpostor.setLinearVelocity(new Vector3(0, 0, 0))
+            }
+
+
+
+            if (lrkey == 1) {
+              player.physicsImpostor.setLinearVelocity(new Vector3(step * Math.sin(cam.rotation.y - degsq), 0, step * Math.cos(cam.rotation.y - degsq)))
+              /*player.position.x += step * Math.sin(cam.rotation.y - degsq)
+              player.position.z += step * Math.cos(cam.rotation.y - degsq)*/
+            }
+            else if (lrkey == -1) {
+              player.physicsImpostor.setLinearVelocity(new Vector3(-step * Math.sin(cam.rotation.y - degsq), 0, -step * Math.cos(cam.rotation.y - degsq)))
+              /*player.position.x -= step * Math.sin(cam.rotation.y - degsq)
+              player.position.z -= step * Math.cos(cam.rotation.y - degsq)*/
+            }
+
+            document.querySelector("#hp").style.width = (hunger * 200 / hunger_max) + "px"
+            document.querySelector("#battery").style.width = (battery * 200 / battery_max) + "px"
+
+            for (let x in entities) {
+              if (entities[x]) {
+                entities[x].lookAt(player.position)
+              }
+            }
+
+
+
+            let _enemspeed = (Math.random() > enemnumber &&
+              Math.sqrt(
+                ((player.position.x - enem.position.x) ** 2) +
+                ((player.position.z - enem.position.z) ** 2)
+              ) < enemsight
+            ) ? enemspeed : enemwalk
+            enem.rotation.x = 0
+            enem.rotation.z = 0
+            enem.position.x += _enemspeed * Math.sin(enem.rotation.y)
+            enem.position.z += _enemspeed * Math.cos(enem.rotation.y)
+
+            if (player.intersectsMesh(enem)) {
+              //alert("Game Over")
+              isplaying = false
+              document.querySelector('#wasted').style.display = "block"
+              document.querySelector('#game').style.display = "none"
+            }
+          }
+
+          setInterval(e => {
+            enem.position = new Vector3(
+              rand(...enemtelposx).real,
+              3,
+              rand(...enemtelposz).real
+            )
+          }, enemteltime)
+
+          document.querySelector("#go").ontouchstart = e => { fbkey = 1 }
+          document.querySelector("#go").ontouchend = e => { fbkey = 0 }
+          document.querySelector("#back").ontouchstart = e => { fbkey = -1 }
+          document.querySelector("#back").ontouchend = e => { fbkey = 0 }
+
+          document.querySelector("#left").ontouchstart = e => { lrkey = 1 }
+          document.querySelector("#left").ontouchend = e => { lrkey = 0 }
+          document.querySelector("#right").ontouchstart = e => { lrkey = -1 }
+          document.querySelector("#right").ontouchend = e => { lrkey = 0 }
+
+          document.querySelector("#lighter").onclick = e => {
+            flashonoff = !flashonoff
+          }
+
+          window.onclick = e => {
+            let pick = scene.pick(scene.pointerX, scene.pointerY)
+
+            if (pick.hit) {
+              let mesh = pick.pickedMesh
+              if (mesh.name == "zombie") {
+
+              }
+              else {
+                //flashonoff=!flashonoff
+              }
+            }
+            else {
+              //flashonoff=!flashonoff
+            }
+          }
+
+          engine.runRenderLoop(loop)
+          window.addEventListener("resize", function() {
+            engine.resize();
+          })
+        }
+      }, splashTime)
+    }
+  </script>
+</body>
+
+</html>
