@@ -437,12 +437,13 @@
               lrkey = 0
             }
           }
-          window.addEventListener('mousedown', e => {
+
+          window.onmousedown=e=>{
             alert(e.button)
             if(e.button == 2){
               flashonoff = !flashonoff
             }
-          })
+          }
 
           document.querySelector("#lighter").onclick = e => {
             flashonoff = !flashonoff
