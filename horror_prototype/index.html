@@ -437,8 +437,8 @@
               lrkey = 0
             }
           }
-          canvas.addEventListener('mousedown', e => {
-            console.log(e.button)
+          window.addEventListener('mousedown', e => {
+            alert(e.button)
             if(e.button == 2){
               flashonoff = !flashonoff
             }
@@ -453,7 +453,6 @@
 
             if (pick.hit) {
               let mesh = pick.pickedMesh
-              alert("mesh")
               if (mesh.name == "zombie") {
 
               }
