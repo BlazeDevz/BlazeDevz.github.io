@@ -449,6 +449,7 @@
           }
 
           window.onclick = e => {
+            alert(e.button)
             let pick = scene.pick(scene.pointerX, scene.pointerY)
 
             if (pick.hit) {
