@@ -13,10 +13,10 @@
     Battery usage:<input type="text" value="0.01">
   </section>
   <section id="loadscreen">
-    Hey man! I'm f**king loading this f**king game... Give me a f**cking second!!
+    Loading screen
   </section>
   <section id="wasted">
-    You R dead
+    U R Dead
     <div id="time"></div>
   </section>
   <section id="game">
@@ -165,6 +165,7 @@
 
           let player = MeshBuilder.CreateBox('player', { height: 3, width: 2, depth: 2 }, scene)
           player.physicsImpostor = new PhysicsImpostor(player, PhysicsImpostor.BoxImpostor, { mass: 1, restitution: 1 }, scene);
+          player.isPickable = false
 
           let flash = new SpotLight("spotLight", new Vector3(0, 0, 0), new Vector3(0, 0, 10), Math.PI / 3, 2, scene);
           flash.range = 25
@@ -237,6 +238,17 @@
           ground.position.y = -1
           ground.receiveShadows = true
 
+          let offswitch = MeshBuilder.CreateBox("off#0",{
+            width: 0.5,
+            height: 0.5,
+            depth: 0.5
+          },scene)
+
+          let red = new PointLight('red', new Vector3(0, 5, 0), scene)
+          //red.diffuse = new Color3(1, 0, 0)
+          red.range = 30
+          red.intensity = 1
+
           let bx = MeshBuilder.CreateBox('bx', { height: 10, width: 10 }, scene)
           bx.position.z = 5
           bx.position.y = 5
@@ -279,7 +291,7 @@
 
 
 
-
+          let redenabled = false
 
           let lrkey = 0
           let fbkey = 0
@@ -395,6 +407,8 @@
               document.querySelector('#wasted').style.display = "block"
               document.querySelector('#game').style.display = "none"
             }
+
+            red.setEnabled(redenabled)
           }
 
           setInterval(e => {
@@ -450,15 +464,10 @@
 
             if (pick.hit) {
               let mesh = pick.pickedMesh
-              if (mesh.name == "zombie") {
-
+              console.log(mesh.name)
+              if (mesh.name == "off#0") {
+                redenabled = !redenabled
               }
-              else {
-                //flashonoff=!flashonoff
-              }
-            }
-            else {
-              //flashonoff=!flashonoff
             }
           }
 
