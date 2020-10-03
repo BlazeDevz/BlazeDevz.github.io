@@ -428,6 +428,10 @@
             else if(e.key == "d"){
               lrkey = -1
             }
+
+            if(e.key == " "){
+              flashonoff = !flashonoff
+            }
           }
           window.onkeyup = e => {
             if(e.key == "w" || e.key == "s"){
@@ -435,13 +439,6 @@
             }
             if(e.key == "a" || e.key == "d"){
               lrkey = 0
-            }
-          }
-
-          window.onmousedown=e=>{
-            alert(e.button)
-            if(e.button == 2){
-              flashonoff = !flashonoff
             }
           }
 
