@@ -437,12 +437,12 @@
               lrkey = 0
             }
           }
-          canvas.onmousedown = e => {
+          canvas.addEventListener('mousedown', e => {
             console.log(e.button)
             if(e.button == 2){
               flashonoff = !flashonoff
             }
-          }
+          })
 
           document.querySelector("#lighter").onclick = e => {
             flashonoff = !flashonoff
