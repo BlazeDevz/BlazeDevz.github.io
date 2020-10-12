@@ -17,7 +17,11 @@
   </section>
   <section id="wasted">
     U R Dead
-    <div id="time"></div>
+    <div class="time"></div>
+  </section>
+  <section id="win">
+    U Win
+    <div class="time"></div>
   </section>
   <section id="game">
     <canvas></canvas>
@@ -127,8 +131,12 @@
       height: auto;
       z-index: 100;
     }
+    #win {
+      display:none;
+    }
   </style>
   <script src="babylon.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
   <!--<script src="cell.js"></script>-->
   <script src="cannon.js"></script>
   <!--<script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>-->
@@ -154,6 +162,7 @@
           let canvas = document.querySelector("canvas")
           let engine = new Engine(canvas, true);
           let scene = new Scene(engine)
+
           scene.clearColor = new Color3(0, 0, 0) //(0, 0, 0)
 
           let gravityVector = new Vector3(0, -9.81, 0)
@@ -210,14 +219,14 @@
           }
 
           let enemspeed = 3
-          let enemwalk = 0.01
-          let enemnumber = 0.4
-          let enemsight = 20
-          let enemeffectdistance = enemsight * 1.5
+          let enemwalk = 0.05
+          let enemnumber = 0.1
+          let enemsight = 25
+          let enemeffectdistance = enemsight * 2
           let enemteltime = 5000
           let enemtelposx = [-100, 100]
           let enemtelposz = [-100, 100]
-          let enem = Enemy/*(0, 3, 75) */(0, -100000000000000000000000000000000, 0, 100)
+          let enem = Enemy/*(0, 3, 75)*/(10**10, 10**10, 10**10)
 
           /*function block(name,x,y,z){
             let e = MeshBuilder.CreateBox(name, {
@@ -231,8 +240,6 @@
 
 
           //now customs
-          let lights = [flash]
-
           function Wall(h, w, d, x, y, z) {
             let e = MeshBuilder.CreateBox('#', { height: h, width: w, depth: d }, scene)
             e.position.y = y
@@ -256,10 +263,62 @@
             }
           }
 
-          Room(100, 100)
+          let room = Room(100, 100)
+          let floorMaterial = new StandardMaterial('floor',scene)
+          floorMaterial.specularColor=new Color3(0,0,0)
+          floorMaterial.diffuseColor=new Color3(0.2,0.1,0)
+          room.floor.material = floorMaterial
+
           Wall(100, 10, 1, 0, 0, 15)
 
-          let offswitch = MeshBuilder.CreateBox("off#0", {
+          let lights = [flash]
+
+          function LIghtSwitch(x,y,z,lx,ly,lz,range,int,onoff,diffuse,specular){
+            let off = MeshBuilder.CreateBox("lightswitch", {
+              width: 0.5,
+              height: 0.5,
+              depth: 0.5
+            }, scene)
+            off.position = new Vector3(x,y,z)
+
+            let l = new PointLight('red', new Vector3(lx, ly, lz), scene)
+            l.diffuse = (diffuse)?diffuse:new Color3(1,1,1)
+            l.specular = (specular)?specular:new Color3(1,1,1)
+            l.range = range
+            l.defInt = int
+            l.ison = true
+            l.intensity = int
+            l.setEnabled(onoff)
+            off.light = l
+            lights.push(l)
+            return off
+          }
+
+          LIghtSwitch(0,2,14.6,0,4,0,30,1,false,new Color3(1,0,0),new Color3(0,1,0.5))
+          LIghtSwitch(0,0,0,-25,4,-25,30,1,false)
+
+
+
+          let load = new AssetsManager(scene)
+          let desktask = load.addMeshTask("desk", "", "./models/", "desk.obj")
+          desktask.onSuccess = function (task) {
+            let deskmaterial = StandardMaterial("desk",scene)
+            task.loadedMeshes[0].position = BABYLON.Vector3.Zero();
+            task.loadedMeshes[0].scaling = new Vector3(0.5,0.5,0.5)
+            let txt = load.addTextureTask("desk txt", "./textures/desk.png");
+              textureTask.onSuccess = function(task2) {
+              deskmaterial.diffuseTexture = task2.texture;
+            }
+            task.loadedMeshes[0].material = deskmaterial
+          }
+          load.load()
+
+          /*SceneLoader.Append("models/", "desk.obj", scene, function (scene) {
+
+              // do something with the scene
+          })*/
+
+          /*let offswitch = MeshBuilder.CreateBox("off#0", {
             width: 0.5,
             height: 0.5,
             depth: 0.5
@@ -269,8 +328,8 @@
           //red.diffuse = new Color3(1, 0, 0)
           red.range = 30
           red.intensity = 1
-          
-          lights.push(red)
+
+          lights.push(red)*/
           //Wall(h,w,d,x,y,z)
           /*let bx = Wall(  20,10,1,  0,5,5)
           let w = Wall(   10,10,1,  12.5,5,5)
@@ -285,7 +344,7 @@
 
 
 
-          let redenabled = true
+          //let redenabled = true
 
           let lrkey = 0
           let fbkey = 0
@@ -303,12 +362,14 @@
           let batteryUsage = battery_usage
 
           let flashonoff = true
-          let light_blink_range = [0,1]
+          let light_blink_max = 1
+          let light_blink_min = 0
 
           let begin = Date.now()
           let min = 0
           let sec = 0
           isplaying = true
+          //let iswin = false
 
           //player.position.y=10
 
@@ -321,7 +382,9 @@
             }
 
             document.querySelector("#timer").innerHTML = min + ":" + (sec - min * 60)
-            document.querySelector("#time").innerHTML = min + ":" + (sec - min * 60)
+            for(let timer of document.querySelectorAll(".time")){
+              timer.innerHTML = min + ":" + (sec - min * 60)
+            }
 
             player.position.y = posy
             //player.position = new Vector3(posx,posy,posz)
@@ -381,30 +444,33 @@
               if (entities[x]) {
                 entities[x].lookAt(player.position)
               }
-          
             }
-            
+
             let __enemspeed = (Math.random() > enemnumber &&
               Math.sqrt(
                 ((player.position.x - enem.position.x) ** 2) +
                 ((player.position.z - enem.position.z) ** 2)
               ) < enemsight) ? enemspeed : enemwalk
-            let _enemspeed = (enem.plane.isOccluded == false)?__enemspeed:0
+            let _enemspeed = (enem.plane.isOccluded == false||__enemspeed==enemwalk)?__enemspeed:0
             enem.rotation.x = 0
             enem.rotation.z = 0
             enem.position.x += _enemspeed * Math.sin(enem.rotation.y)
             enem.position.z += _enemspeed * Math.cos(enem.rotation.y)
-            for (let x of lights) {
-              if (
-                Math.sqrt(
-                  ((x.position.x - enem.position.x) ** 2) +
-                  ((x.position.z - enem.position.z) ** 2)
-                ) < enemeffectdistance
-              ) {
-                x.intensity = rand(...light_blink_range).real
+
+            for (let l of lights) {
+              let dist = Math.sqrt(
+                ((l.position.x - enem.position.x) ** 2) +
+                ((l.position.z - enem.position.z) ** 2)
+              )
+              if (dist < enemeffectdistance) {
+                light_blink_min = dist/enemeffectdistance
+                l.intensity = rand(light_blink_min,light_blink_max).real*((l.defInt)?l.defInt:1)
               }
               else{
-                x.intensity=1
+                l.intensity=1
+                if(l.defInt){
+                  l.intensity = l.defInt
+                }
               }
             }
 
@@ -413,7 +479,7 @@
               document.querySelector('#wasted').style.display = "block"
               document.querySelector('#game').style.display = "none"
             }
-            red.setEnabled(redenabled)
+            //red.setEnabled(redenabled)
           }
 
           setInterval(e => {
@@ -469,8 +535,9 @@
             if (pick.hit) {
               let mesh = pick.pickedMesh
               //console.log(mesh.name)
-              if (mesh.name == "off#0") {
-                redenabled = !redenabled
+              if (mesh.name == "lightswitch") {
+                mesh.ison = !mesh.ison
+                mesh.light.setEnabled(mesh.ison)
               }
             }
           }
