@@ -306,7 +306,7 @@
           desktask.onSuccess = function (task) {
             let deskmaterial = StandardMaterial("desk",scene)
             task.loadedMeshes[0].position = new Vector3(0,1,0)
-            task.loadedMeshes[0].scaling = new Vector3(0.05,0.05,0.05)
+            task.loadedMeshes[0].scaling = new Vector3(0.01,0.01,0.01)
             let txt = load.addTextureTask("desk txt", "./textures/desk.png");
               textureTask.onSuccess = function(task2) {
               deskmaterial.diffuseTexture = task2.texture;
