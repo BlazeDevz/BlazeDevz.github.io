@@ -180,7 +180,7 @@
           flash.range = 25
 
           let moon = new HemisphericLight("light1", new Vector3(0, 5, 3), scene)
-          moon.intensity = 0.01
+          moon.intensity = 1//0.01
 
           /*let red = new PointLight('red', new Vector3(2, 2, 2), scene)
           red.diffuse = new Color3(1, 0, 0)
@@ -268,6 +268,8 @@
           floorMaterial.specularColor=new Color3(0,0,0)
           floorMaterial.diffuseColor=new Color3(0.2,0.1,0)
           room.floor.material = floorMaterial
+          room.ceiling.setEnabled(false)
+          room.floor.setEnabled(false)
 
           Wall(100, 10, 1, 0, 0, 15)
 
@@ -309,7 +311,7 @@
               textureTask.onSuccess = function(task2) {
               deskmaterial.diffuseTexture = task2.texture;
             }
-            task.loadedMeshes[0].material = deskmaterial
+            //task.loadedMeshes[0].material = deskmaterial
           }
           load.load()
 
