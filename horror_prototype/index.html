@@ -160,11 +160,11 @@
           let physicsPlugin = new CannonJSPlugin()
           scene.enablePhysics(gravityVector, physicsPlugin)
 
-          let cam = new FreeCamera("cam", new Vector3(0, 1.5, 0), scene)
+          let cam = new FreeCamera("cam", new Vector3(0, 2, 0), scene)
           cam.attachControl(canvas, true)
 
-          let player = MeshBuilder.CreateBox('player', { height: 3, width: 2, depth: 2 }, scene)
-          player.physicsImpostor = new PhysicsImpostor(player, PhysicsImpostor.BoxImpostor, { mass: 1, restitution: 1 }, scene);
+          let player = MeshBuilder.CreateSphere('player', { diameterY: 2, diameterX: 1, diameterZ: 1 }, scene)
+          player.physicsImpostor = new PhysicsImpostor(player, PhysicsImpostor.SphereImpostor, { mass: 1, restitution: 1 }, scene);
           player.isPickable = false
 
           let flash = new SpotLight("spotLight", new Vector3(0, 0, 0), new Vector3(0, 0, 10), Math.PI / 3, 2, scene);
@@ -192,7 +192,7 @@
             }
           }
 
-          function zombie(x, y, z) {
+          function Enemy(x, y, z) {
             let enemy = new Mesh('zombie', scene)
             let plane = MeshBuilder.CreatePlane('zombie', { width: 3, height: 6 }, scene)
             plane.rotation.y = -Math.PI
@@ -215,7 +215,7 @@
           let enemteltime = 5000
           let enemtelposx = [-100, 100]
           let enemtelposz = [-100, 100]
-          let enem = zombie(0, -100000000000000000000000000000000, 0, 100)
+          let enem = Enemy(0, -100000000000000000000000000000000, 0, 100)
 
           /*function block(name,x,y,z){
             let e = MeshBuilder.CreateBox(name, {
@@ -229,14 +229,29 @@
 
 
           //now customs
+          function Wall(h,w,d,x,y,z){
+            let e = MeshBuilder.CreateBox('#', { height: h, width: w, depth:d }, scene)
+            e.position.y = y
+            e.position.z = z
+            e.position.x = x
 
-          let ground = MeshBuilder.CreateBox("box", {
-            width: 1000,
-            height: 1,
-            depth: 1000
-          }, scene)
-          ground.position.y = -1
-          ground.receiveShadows = true
+            e.physicsImpostor = new PhysicsImpostor(e, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 1 }, scene)
+            return e
+          }
+          function Room(w,d){
+            return {
+              floor:Wall(1,w,d,0,-1,0),
+              ceiling:Wall(1,w,d,0,6,0),
+              walls:[
+                Wall(20,1,d,w/2,0,0),
+                Wall(20,1,d,-w/2,0,0),
+                Wall(20,w,1,0,0,d/2),
+                Wall(20,w,1,0,0,-d/2)
+              ]
+            }
+          }
+
+          Room(50,10)
 
           let offswitch = MeshBuilder.CreateBox("off#0",{
             width: 0.5,
@@ -248,43 +263,14 @@
           //red.diffuse = new Color3(1, 0, 0)
           red.range = 30
           red.intensity = 1
-
-          let bx = MeshBuilder.CreateBox('bx', { height: 10, width: 10 }, scene)
-          bx.position.z = 5
-          bx.position.y = 5
-          bx.receiveShadows = true
-
-          bx.physicsImpostor = new PhysicsImpostor(bx, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 1 }, scene)
-
-          let w = MeshBuilder.CreateBox('#', { height: 10, width: 10 }, scene)
-          w.position.y = 5
-          w.position.z = 5
-          w.position.x = 12.5
-
-          w.physicsImpostor = new PhysicsImpostor(w, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 1 }, scene)
-
-
-          let e = MeshBuilder.CreateBox('#', { height: 5, width: 5 }, scene)
-          e.position.y = 7.5
-          e.position.z = 5
-          e.position.x = 7
-
-          e.physicsImpostor = new PhysicsImpostor(e, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 1 }, scene)
-
-
-          ground.physicsImpostor = new PhysicsImpostor(ground, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 0 }, scene)
+          //Wall(h,w,d,x,y,z)
+          /*let bx = Wall(  20,10,1,  0,5,5)
+          let w = Wall(   10,10,1,  12.5,5,5)
+          let e = Wall(   5,5,1,    7,7.5,5)*/
+          //bx.receiveShadows = true
           //shgen.getShadowMap().renderList.push(bx)
           //shgen.addShadowCaster(bx)
 
-
-
-
-
-          //let xx = MeshBuilder.CreateBox('bx', {}, scene)
-          //xx.position.x = 4
-          //xx.receiveShadows = true
-          //shgen.getShadowMap().renderList.push(xx)
-          //shgen.addShadowCaster(xx)
 
 
 
@@ -464,7 +450,7 @@
 
             if (pick.hit) {
               let mesh = pick.pickedMesh
-              console.log(mesh.name)
+              //console.log(mesh.name)
               if (mesh.name == "off#0") {
                 redenabled = !redenabled
               }
