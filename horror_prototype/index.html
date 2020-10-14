@@ -252,7 +252,7 @@
 
           function Room(w, d) {
             return {
-              floor: Wall(1, w*10, d*10, 0, -1, 0),
+              floor: Wall(1, w, d, 0, -1, 0),
               ceiling: Wall(1, w, d, 0, 6, 0),
               walls: [
                 Wall(20, 1, d, w / 2, 0, 0),
@@ -267,8 +267,21 @@
           let floorMaterial = new StandardMaterial('floor',scene)
           floorMaterial.specularColor=new Color3(0,0,0)
           floorMaterial.diffuseTexture=new Texture('textures/floor.jpg',scene)
+          floorMaterial.diffuseTexture.vScale = 15
+          floorMaterial.diffuseTexture.uScale = 15
           room.floor.material = floorMaterial
-          room.floor.scaling = new Vector3(0.1,0.1,0.1)
+          
+          let ceilMaterial = new StandardMaterial('ceil',scene)
+          ceilMaterial.specularColor = new Color3(0,0,0)
+          room.ceiling.material = ceilMaterial
+          
+          for(let w of room.walls){
+            let mat = new StandardMaterial('ceil',scene)
+            mat.specularColor = new Color3(0,0,0)
+            mat.diffuseColor = new Color3(0.5,0.5,0.5)
+            w.material = mat
+          }
+          
           /*room.ceiling.setEnabled(false)
           room.floor.setEnabled(false)*/
 
