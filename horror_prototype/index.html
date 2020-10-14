@@ -255,10 +255,10 @@
               floor: Wall(1, w, d, 0, -1, 0),
               ceiling: Wall(1, w, d, 0, 6, 0),
               walls: [
-                Wall(20, 1, d, w / 2, 0, 0),
-                Wall(20, 1, d, -w / 2, 0, 0),
-                Wall(20, w, 1, 0, 0, d / 2),
-                Wall(20, w, 1, 0, 0, -d / 2)
+                Wall(w, 1, d, w / 2, 0, 0),
+                Wall(w, 1, d, -w / 2, 0, 0),
+                Wall(d, w, 1, 0, 0, d / 2),
+                Wall(d, w, 1, 0, 0, -d / 2)
               ]
             }
           }
@@ -271,15 +271,19 @@
           floorMaterial.diffuseTexture.uScale = 15
           room.floor.material = floorMaterial
           
-          let ceilMaterial = new StandardMaterial('ceil',scene)
-          ceilMaterial.specularColor = new Color3(0,0,0)
-          room.ceiling.material = ceilMaterial
+          let wallMaterial = new StandardMaterial('ceil',scene)
+          wallMaterial.specularColor = new Color3(0,0,0)
+          wallMaterial.diffuseTexture = new Texture('textures/wall.jpg',scene)
+          /*wallMaterial.diffuseTexture.vScale=1
+          wallMaterial.diffuseTexture.uScale=1*/
           
+          room.ceiling.material = wallMaterial
+          room.ceiling.material.diffuseTexture.vScale = 5
+          room.ceiling.material.diffuseTexture.uScale = 5
           for(let w of room.walls){
-            let mat = new StandardMaterial('ceil',scene)
-            mat.specularColor = new Color3(0,0,0)
-            mat.diffuseColor = new Color3(0.5,0.5,0.5)
-            w.material = mat
+            w.material = wallMaterial
+            w.material.diffuseTexture.uScale = 5
+            w.material.diffuseTexture.vScale = 5
           }
           
           /*room.ceiling.setEnabled(false)
