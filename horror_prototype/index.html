@@ -294,7 +294,8 @@
           room.floor.setEnabled(false)*/
 
           Wall(100, 10, 1, 0, 0, 15,wall=>{
-            wall.material = wallMaterial 
+            wall.material = wallMaterial
+            wall.material.diffuseTexture.uScale = 10
           })
 
           let lights = [flash]
