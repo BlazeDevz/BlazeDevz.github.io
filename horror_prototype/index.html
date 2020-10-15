@@ -250,8 +250,8 @@
             return e
           }
 
-          function Room(w, d) {
-            return {
+          function Room(w, d, f) {
+            let data = {
               floor: Wall(1, w, d, 0, -1, 0),
               ceiling: Wall(1, w, d, 0, 6, 0),
               walls: [
@@ -261,6 +261,8 @@
                 Wall(d, w, 1, 0, 0, -d / 2)
               ]
             }
+            f(data)
+            return data
           }
 
           let room = Room(100, 100)
@@ -289,7 +291,9 @@
           /*room.ceiling.setEnabled(false)
           room.floor.setEnabled(false)*/
 
-          Wall(100, 10, 1, 0, 0, 15)
+          Wall(100, 10, 1, 0, 0, 15,wall=>{
+            wall.material = wallMaterial 
+          })
 
           let lights = [flash]
 
