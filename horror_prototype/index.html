@@ -297,10 +297,9 @@
             let m = new StandardMaterial('m',scene)
             m.specularColor = new Color3(0,0,0)
             m.diffuseTexture = new Texture('textures/wall.jpg',scene)
-            m.diffuseTexture.vScale=2
+            m.diffuseTexture.vScale=5
             wall.material = m
           })
-
           let lights = [flash]
 
           function LightSwitch(x,y,z,lx,ly,lz,range,int,onoff,diffuse,specular){
