@@ -294,8 +294,11 @@
           room.floor.setEnabled(false)*/
 
           Wall(100, 10, 1, 0, 0, 15,wall=>{
-            wall.material = wallMaterial
-            wall.material.diffuseTexture.vScale = 2
+            let m = new StandardMaterial('ceil',scene)
+            m.specularColor = new Color3(0,0,0)
+            m.diffuseTexture = new Texture('textures/wall.jpg',scene)
+            m.diffuseTexture.vScale=5
+            wall.material = m
           })
 
           let lights = [flash]
