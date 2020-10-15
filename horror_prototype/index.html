@@ -240,13 +240,15 @@
 
 
           //now customs
-          function Wall(h, w, d, x, y, z) {
+          function Wall(h, w, d, x, y, z,f) {
             let e = MeshBuilder.CreateBox('#', { height: h, width: w, depth: d }, scene)
             e.position.y = y
             e.position.z = z
             e.position.x = x
 
             e.physicsImpostor = new PhysicsImpostor(e, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 1 }, scene)
+            
+            if(f){f(e)}
             return e
           }
 
@@ -261,7 +263,7 @@
                 Wall(d, w, 1, 0, 0, -d / 2)
               ]
             }
-            f(data)
+            if(f){f(data)}
             return data
           }
 
