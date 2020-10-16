@@ -277,17 +277,18 @@
           
           let wallMaterial = new StandardMaterial('ceil',scene)
           wallMaterial.specularColor = new Color3(0,0,0)
-          wallMaterial.diffuseTexture = new Texture('textures/wall.jpg',scene)
+          //wallMaterial.diffuseTexture = new Texture('textures/wall.jpg',scene)
+          wallMaterial.diffuseColor = new Color3(0.4,0.4,0.4)
           /*wallMaterial.diffuseTexture.vScale=1
           wallMaterial.diffuseTexture.uScale=1*/
           
           room.ceiling.material = wallMaterial
-          room.ceiling.material.diffuseTexture.vScale = 5
-          room.ceiling.material.diffuseTexture.uScale = 5
+          //room.ceiling.material.diffuseTexture.vScale = 5
+          //room.ceiling.material.diffuseTexture.uScale = 5
           for(let w of room.walls){
             w.material = wallMaterial
-            w.material.diffuseTexture.uScale = 5
-            w.material.diffuseTexture.vScale = 5
+            //w.material.diffuseTexture.uScale = 5
+            //w.material.diffuseTexture.vScale = 5
           }
           
           /*room.ceiling.setEnabled(false)
@@ -296,10 +297,43 @@
           Wall(100, 10, 1, 0, 0, 15,wall=>{
             let m = new StandardMaterial('m',scene)
             m.specularColor = new Color3(0,0,0)
-            m.diffuseTexture = new Texture('textures/wall.jpg',scene)
-            m.diffuseTexture.vScale=1.5
+            m.diffuseColor = new Color3(0.4,0.4,0.4)
+            //m.diffuseTexture = new Texture('textures/wall.jpg',scene)
+            //m.diffuseTexture.vScale=1.5
             wall.material = m
           })
+          
+          
+          function Table(x,y,z){
+            let top = Wall(0.2,5,5,x,y+1.5,z)
+            let leg1 = Wall(2.5,0.5,0.5,x+2,y+0.3,z+2)
+            let leg2 = Wall(2.5,0.5,0.5,x+2,y+0.3,z-2)
+            let leg3 = Wall(2.5,0.5,0.5,x-2,y+0.3,z+2)
+            let leg4 = Wall(2.5,0.5,0.5,x-2,y+0.3,z-2)
+            function forall(f){
+              for(let x of [top,leg1,leg2,leg3,leg4]){
+                f(x)
+              }
+            }
+            function setMaterial(mat){
+              forall(function(x){
+                x.material = mat
+              })
+            }
+            return {
+              top:top,
+              legs:[leg1,leg2,leg3,leg4],
+              setMaterial:setMaterial,
+              forall:forall
+            }
+          }
+          let table1 = Table(10,0,0)
+          
+          let tableMaterial = new StandardMaterial('table',scene)
+          tableMaterial.diffuseTexture = new Texture('textures/table.jpg',scene)
+          table1.setMaterial(tableMaterial)
+          
+          
           let lights = [flash]
 
           function LightSwitch(x,y,z,lx,ly,lz,range,int,onoff,diffuse,specular){
