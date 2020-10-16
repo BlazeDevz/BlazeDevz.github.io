@@ -304,6 +304,12 @@
             wall.material = m
           })
 
+          function Battery(x,y,z){
+            let bat = Wall(0.75,0.4,0.4,x,y,z,e=>{
+              e.name = "battery"
+            })
+            return
+          }
 
           function Table(x,y,z){
             let top = Wall(0.2,5,5,x,y+1.5,z)
@@ -328,6 +334,7 @@
               forall:forall
             }
           }
+          let bat1 = Battery(10,2,0)
           let table1 = Table(10,0,0)
 
           let tableMaterial = new StandardMaterial('table',scene)
