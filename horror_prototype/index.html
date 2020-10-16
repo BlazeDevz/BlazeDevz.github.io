@@ -18,6 +18,7 @@
   <section id="wasted">
     U R Dead
     <div class="time"></div>
+    <a href="index.html">Play again</a>
   </section>
   <section id="win">
     U Win
@@ -247,7 +248,7 @@
             e.position.x = x
 
             e.physicsImpostor = new PhysicsImpostor(e, PhysicsImpostor.BoxImpostor, { mass: 0, restitution: 1 }, scene)
-            
+
             if(f){f(e)}
             return e
           }
@@ -274,14 +275,14 @@
           floorMaterial.diffuseTexture.vScale = 15
           floorMaterial.diffuseTexture.uScale = 15
           room.floor.material = floorMaterial
-          
+
           let wallMaterial = new StandardMaterial('ceil',scene)
           wallMaterial.specularColor = new Color3(0,0,0)
           //wallMaterial.diffuseTexture = new Texture('textures/wall.jpg',scene)
           wallMaterial.diffuseColor = new Color3(0.4,0.4,0.4)
           /*wallMaterial.diffuseTexture.vScale=1
           wallMaterial.diffuseTexture.uScale=1*/
-          
+
           room.ceiling.material = wallMaterial
           //room.ceiling.material.diffuseTexture.vScale = 5
           //room.ceiling.material.diffuseTexture.uScale = 5
@@ -290,7 +291,7 @@
             //w.material.diffuseTexture.uScale = 5
             //w.material.diffuseTexture.vScale = 5
           }
-          
+
           /*room.ceiling.setEnabled(false)
           room.floor.setEnabled(false)*/
 
@@ -302,8 +303,8 @@
             //m.diffuseTexture.vScale=1.5
             wall.material = m
           })
-          
-          
+
+
           function Table(x,y,z){
             let top = Wall(0.2,5,5,x,y+1.5,z)
             let leg1 = Wall(2.5,0.5,0.5,x+2,y+0.3,z+2)
@@ -328,12 +329,12 @@
             }
           }
           let table1 = Table(10,0,0)
-          
+
           let tableMaterial = new StandardMaterial('table',scene)
           tableMaterial.diffuseTexture = new Texture('textures/table.jpg',scene)
           table1.setMaterial(tableMaterial)
-          
-          
+
+
           let lights = [flash]
 
           function LightSwitch(x,y,z,lx,ly,lz,range,int,onoff,diffuse,specular){
@@ -370,9 +371,9 @@
             task.loadedMeshes[0].position = new Vector3(100,0,0)
             task.loadedMeshes[0].scaling = new Vector3(0.01,0.01,0.01)
             task.loadedMeshes[0].bakeCurrentTransformIntoVertices()
-            
-            
-            
+
+
+
             let txt = load.addTextureTask("desk txt", "./textures/desk.png");
               textureTask.onSuccess = function(task2) {
               deskmaterial.diffuseTexture = task2.texture;
