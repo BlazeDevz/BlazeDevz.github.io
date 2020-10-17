@@ -8,10 +8,6 @@
 </head>
 
 <body>
-  <section id="menu">
-    <button id="run">Run</button><br>
-    Battery usage:<input id="battery" type="text" value="0.01">
-  </section>
   <section id="loadscreen">
     Loading screen
   </section>
@@ -19,21 +15,13 @@
     * {
       overflow: hidden;
     }
-    #menu {
-      display: none;
-    }
   </style>
   <script>
     let splashTime = 2000
     setTimeout(function() {
-      document.querySelector('#menu').style.display = "block"
-      document.querySelector('#loadscreen').style.display = "none"
-      document.querySelector('#run').onclick = e => {
-        sessionStorage.batteryUsage = document.querySelector('#battery').value
         let a = document.createElement('a')
-        a.href = "game.html"
+        a.href = "menu.html"
         a.click()
-      }
     }, splashTime)
   </script>
 </body>
