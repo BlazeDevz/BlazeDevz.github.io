@@ -26,10 +26,10 @@
   </section>
   <section id="game">
     <canvas></canvas>
-    <button id="go"></button>
-    <button id="back"></button>
-    <button id="left"></button>
-    <button id="right"></button>
+    <button id="go" class="movement"></button>
+    <button id="back" class="movement"></button>
+    <button id="left" class="movement"></button>
+    <button id="right" class="movement"></button>
     <button id="lighter"></button>
     <div id="hp"></div>
     <div id="timer">00:00</div>
@@ -135,6 +135,21 @@
     #win {
       display:none;
     }
+
+    @media (min-width:320px)/* and (max-width:500px)*/{
+      .movement{
+        display: block;
+      }
+    }
+    /*@media (min-width:581px){}
+    @media (min-width:768px){}
+    @media (min-width:1024px){}*/
+    @media (min-width:1170px){
+      .movement{
+        display: none;
+      }
+    }
+    /*@media (min-width:1600px){}*/
   </style>
   <script src="babylon.js"></script>
   <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
@@ -429,6 +444,7 @@
             e.position = new Vector3(x,y,z)
             for(let x of e.sides){
               let m = new StandardMaterial('bat',scene)
+              m.specularColor = new Color3(0,0,0)
               m.diffuseTexture = new Texture('textures/battery.png')
               m.diffuseTexture.hasAlpha = true
               x.material = m
