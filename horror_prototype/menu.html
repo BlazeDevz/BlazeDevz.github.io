@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Horror Prototype</title>
+</head>
+
+<body>
+  <section id="menu">
+    <button id="run">Run</button><br>
+    Battery usage:<input id="battery" type="text" value="0.01">
+  </section>
+  <section id="loadscreen">
+    Loading screen
+  </section>
+  <style>
+    * {
+      overflow: hidden;
+    }
+    #menu {
+      display: none;
+    }
+  </style>
+  <script>
+    document.querySelector('#menu').style.display = "block"
+    document.querySelector('#loadscreen').style.display = "none"
+    document.querySelector('#run').onclick = e => {
+      sessionStorage.batteryUsage = document.querySelector('#battery').value
+      let a = document.createElement('a')
+      a.href = "game.html"
+      a.click()
+    }
+  </script>
+</body>
+
+</html>
