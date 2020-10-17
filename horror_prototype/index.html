@@ -636,8 +636,8 @@
             enem.position.x += _enemspeed * Math.sin(enem.rotation.y)
             enem.position.z += _enemspeed * Math.cos(enem.rotation.y)
             for(let x  of items){
-              //x.rotation.y+=0.01
-              x.lookAt(player.position)
+              x.rotation.y+=0.01
+              //x.lookAt(player.position)
             }
             for (let l of lights) {
               let dist = Math.sqrt(
