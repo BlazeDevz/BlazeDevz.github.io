@@ -14,7 +14,7 @@
   <section id="wasted">
     U R Dead
     <div class="time"></div>
-    <a href="game.html">Play again</a>
+    <a href="game.html">Play again</a><br>
     <a href="menu.html">Main menu</a>
   </section>
   <section id="win">
@@ -31,10 +31,24 @@
     <div id="hp"></div>
     <div id="timer">00:00</div>
     <div id="battery"></div>
+    <div id="pause_menu">
+      <div>
+        <h1>Paused</h1><br>
+        <a href="game.html">Restart game</a><br>
+        <a href="menu.html">Main menu</a>
+      </div>
+    </div>
   </section>
   <style>
     * {
       overflow: hidden;
+    }
+    body{
+      background: black;
+    }
+    #loadscreen,#win,#wasted{
+      background: black;
+      color:white;
     }
 
     #game,
@@ -131,6 +145,25 @@
     #win {
       display:none;
     }
+    #pause_menu{
+      display:none;
+      background: none;
+      position: fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      z-index: 1000;
+      text-align: center;
+      color:white;
+    }
+    #pause_menu div{
+      display: inline-block;
+      width:80%;
+      height:50%;
+      background:rgba(0,0,0,0.5);
+    }
+
 
     @media (min-width:320px)/* and (max-width:500px)*/{
       .movement{
@@ -155,8 +188,8 @@
   <script>
     with(BABYLON) {
       setTimeout(e=>{
-
-        runGame(sessionStorage.batteryUsage)
+        let gameData = JSON.parse(sessionStorage.gameData)
+        runGame(gameData.batteryUsage)
         function runGame(battery_usage) {
           document.querySelector("#game").style.display = "block"
           document.querySelector('#loadscreen').style.display = "none"
@@ -534,11 +567,17 @@
           let min = 0
           let sec = 0
           isplaying = true
+          let pause = false
           //let iswin = false
 
           //player.position.y=10
 
           function loop() {
+            if(!pause){
+            document.querySelector("#pause_menu").style.display = "none"
+            for(let x of document.querySelectorAll("#hp,#battery,#timer")){
+              x.style.display = "block"
+            }
             //console.log(bx.position.y)
             scene.render()
             if (isplaying) {
@@ -574,6 +613,7 @@
             if (flashonoff) {
               battery -= batteryUsage
             }
+
 
             if (fbkey == 1) {
               player.physicsImpostor.setLinearVelocity(new Vector3(step * Math.sin(cam.rotation.y), 0, step * Math.cos(cam.rotation.y)))
@@ -622,8 +662,9 @@
             enem.position.x += _enemspeed * Math.sin(enem.rotation.y)
             enem.position.z += _enemspeed * Math.cos(enem.rotation.y)
             for(let x  of items){
-              x.rotation.y+=0.01
-              //x.lookAt(player.position)
+              //x.rotation.y+=0.01
+              x.lookAt(player.position)
+              x.rotation.x = 0
             }
             for (let l of lights) {
               let dist = Math.sqrt(
@@ -649,13 +690,23 @@
             }
             //red.setEnabled(redenabled)
           }
+          else{
+            document.querySelector("#pause_menu").style.display = "block"
+            for(let x of document.querySelectorAll("#hp,#battery,#timer")){
+              x.style.display = "none"
+            }
 
+
+          }
+          }
           setInterval(e => {
+            if(!pause){
             enem.position = new Vector3(
               rand(...enemtelposx).real,
               3,
               rand(...enemtelposz).real
             )
+          }
           }, enemteltime)
 
           document.querySelector("#go").ontouchstart = e => { fbkey = 1 }
@@ -683,6 +734,12 @@
             if (e.key == " ") {
               flashonoff = !flashonoff
             }
+            if(e.key == "Escape"){
+              pause = !pause
+            }
+            else{
+              console.log("Key: "+e.key)
+            }
           }
           window.onkeyup = e => {
             if (e.key == "w" || e.key == "s") {
@@ -702,7 +759,7 @@
 
             if (pick.hit) {
               let mesh = pick.pickedMesh
-              console.log(mesh.name)
+              console.log("Click: "+mesh.name)
               if (mesh.name == "lightswitch"){
                 mesh.ison = !mesh.ison
                 mesh.light.setEnabled(mesh.ison)
