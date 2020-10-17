@@ -18,6 +18,8 @@
   <style>
     * {
       overflow: hidden;
+      background: black;
+      color:white;
     }
     #menu {
       display: none;
@@ -27,7 +29,9 @@
     document.querySelector('#menu').style.display = "block"
     document.querySelector('#loadscreen').style.display = "none"
     document.querySelector('#run').onclick = e => {
-      sessionStorage.batteryUsage = document.querySelector('#battery').value
+      sessionStorage.gameData = JSON.stringify({
+        batteryUsage:document.querySelector('#battery').value
+      })
       let a = document.createElement('a')
       a.href = "game.html"
       a.click()
