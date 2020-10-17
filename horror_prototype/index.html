@@ -239,10 +239,31 @@
             return e
           }*/
 
+          function Plane(name,data,sc){
+            let e = new Mesh(name,sc)
+            let pl = MeshBuilder.CreatePlane(name+"_plane",data,sc)
+            pl.rotation.y = -Math.PI
+            e.addChild(pl)
+            e.plane = pl
+            return e
+          }
 
+          function Card(name,data,sc){
+            let e = new Mesh(name,sc)
+            let pl1 = MeshBuilder.CreatePlane(name+"_plane",data,sc)
+            let pl2 = MeshBuilder.CreatePlane(name+"_plane",data,sc)
+            pl2.rotation.y = -Math.PI
+            e.addChild(pl1)
+            e.addChild(pl2)
+            e.sides = [pl1,pl2]
+            return e
+          }
           //now customs
-          function Wall(h, w, d, x, y, z,f) {
-            let e = MeshBuilder.CreateBox('#', { height: h, width: w, depth: d }, scene)
+
+
+
+          function Wall(h, w, d, x, y, z,f,n) {
+            let e = MeshBuilder.CreateBox((n)?n:"#", { height: h, width: w, depth: d }, scene)
             e.position.y = y
             e.position.z = z
             e.position.x = x
@@ -304,12 +325,44 @@
             wall.material = m
           })
 
-          function Battery(x,y,z){
-            let bat = Wall(0.3,0.2,0.2,x,y,z,e=>{
+          /*function Battery(x,y,z,n){
+            /*let body = Wall(0.3,0.3,0.3,x,y,z,e=>{
               e.name = "battery"
             })
-            return
-          }
+            //body.name = "battery"
+            let q = new StandardMaterial('transparent',scene)
+            q.alpha = 1
+            body.material = q
+            let bat1 = Wall(0.2,0.1,0.1,x,y+0.1,z,wall=>{
+              let m = new StandardMaterial('m',scene)
+              //m.specularColor = new Color3(0,0,0)
+              m.diffuseColor = new Color3(0.4,0.4,0.4)
+              wall.material = m
+            })
+            let bat2 = Wall(0.1,0.2,0.2,x,y+0.1,z,wall=>{
+              let m = new StandardMaterial('m',scene)
+              //m.specularColor = new Color3(0,0,0)
+              m.diffuseColor = new Color3(1,0.5,0)
+              wall.material = m
+            })
+            let bat3 = Wall(0.2,0.2,0.2,x,y-0.05,z,e=>{
+              let m = new StandardMaterial('m',scene)
+              //m.specularColor = new Color3(0,0,0)
+              m.diffuseColor = new Color3(0.1,0.1,0.1)
+              e.material = m
+            })
+            body.addChild(bat1)
+            body.addChild(bat2)
+            body.addChild(bat2)
+            return body
+            let e = MeshBuilder.CreateBox((n)?n:"battery", {
+              width: 0.2,
+              height: 0.3,
+              depth: 0.2
+            }, scene)
+            e.position = new Vector3(x,y,z)
+            return e
+          }*/
 
           function Table(x,y,z){
             let hitbox = Wall(100,4,4,x,y,z)
@@ -338,7 +391,7 @@
               forall:forall
             }
           }
-          let bat1 = Battery(10,2,0)
+
           let table1 = Table(10,0,0)
 
           let tableMaterial = new StandardMaterial('table',scene)
@@ -369,8 +422,38 @@
             return off
           }
 
+          let items = []
+
+          function Battery(x,y,z){
+            let e = Card('battery',{},scene)
+            e.position = new Vector3(x,y,z)
+            for(let x of e.sides){
+              let m = new StandardMaterial('bat',scene)
+              m.diffuseTexture = new Texture('textures/battery.png')
+              m.diffuseTexture.hasAlpha = true
+              x.material = m
+              x.del=()=>{
+                e.dispose()
+                e.sides[0].dispose()
+                e.sides[1].dispose()
+              }
+            }
+            items.push(e)
+            return e
+
+            /*let off = MeshBuilder.CreateBox("battery", {
+              width: 0.5,
+              height: 0.5,
+              depth: 0.5
+            }, scene)
+            off.position = new Vector3(x,y,z)
+            return off*/
+          }
+          let bat1 = Battery(0,0,10)
+
+          //LightSwitchx(-2,2,14.6,0,4,15,35,1,false)
           LightSwitch(0,2,14.6,0,4,0,35,1,false)
-          LightSwitch(0,0,0,-25,4,-25,35,1,false)
+          LightSwitch(2,2,14.6,-25,4,-25,35,1,false)
 
 
 
@@ -431,7 +514,7 @@
           let posx = 0
           let posz = 0
           let posy = 1.5
-          let step = 4
+          let step = 10
           let degsq = Math.PI / 2
 
           let hunger = 100
@@ -536,7 +619,9 @@
             enem.rotation.z = 0
             enem.position.x += _enemspeed * Math.sin(enem.rotation.y)
             enem.position.z += _enemspeed * Math.cos(enem.rotation.y)
-
+            for(let x  of items){
+              x.rotation.y+=0.01
+            }
             for (let l of lights) {
               let dist = Math.sqrt(
                 ((l.position.x - enem.position.x) ** 2) +
@@ -614,10 +699,14 @@
 
             if (pick.hit) {
               let mesh = pick.pickedMesh
-              //console.log(mesh.name)
-              if (mesh.name == "lightswitch") {
+              console.log(mesh.name)
+              if (mesh.name == "lightswitch"){
                 mesh.ison = !mesh.ison
                 mesh.light.setEnabled(mesh.ison)
+              }
+              else if (mesh.name == "battery_plane"){
+                battery = 100
+                mesh.del()
               }
             }
           }
