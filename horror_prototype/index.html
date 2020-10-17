@@ -365,7 +365,7 @@
           }*/
 
           function Table(x,y,z){
-            let hitbox = Wall(100,4,4,x,y,z)
+            let hitbox = Wall(2,0,4,x,y+3,z)
             let q = new StandardMaterial('transparent',scene)
             q.alpha = 0
             hitbox.material = q
