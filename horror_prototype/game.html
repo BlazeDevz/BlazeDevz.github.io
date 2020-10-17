@@ -15,7 +15,7 @@
     U R Dead
     <div class="time"></div>
     <a href="game.html">Play again</a><br>
-    <a href="menu.html">Main menu</a>
+    <a href="menu.html">Main menu</a><br>
   </section>
   <section id="win">
     U Win
@@ -35,7 +35,8 @@
       <div>
         <h1>Paused</h1><br>
         <a href="game.html">Restart game</a><br>
-        <a href="menu.html">Main menu</a>
+        <a href="menu.html">Main menu</a><br>
+        <button id="play">Close</button>
       </div>
     </div>
   </section>
@@ -160,7 +161,7 @@
     #pause_menu div{
       display: inline-block;
       width:80%;
-      height:50%;
+      /*height:50%;*/
       background:rgba(0,0,0,0.5);
     }
 
@@ -718,6 +719,12 @@
           document.querySelector("#left").ontouchend = e => { lrkey = 0 }
           document.querySelector("#right").ontouchstart = e => { lrkey = -1 }
           document.querySelector("#right").ontouchend = e => { lrkey = 0 }
+          document.querySelector('#timer').onclick=e=>{
+            pause=!pause
+          } 
+          document.querySelector ('#play').onclick=e=>{
+            pause=!pause
+          }
           window.onkeydown = e => {
             if (e.key == "w") {
               fbkey = 1
